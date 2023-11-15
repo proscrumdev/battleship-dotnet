@@ -16,6 +16,8 @@ namespace Battleship.Ascii
 
         private static ITelemetryClient telemetryClient;
 
+        private static ConsoleRenderer consoleRenderer = new ConsoleRenderer();
+
         static void Main()
         {
             telemetryClient = new ApplicationInsightsTelemetryClient();
@@ -26,20 +28,7 @@ namespace Battleship.Ascii
                 Console.Title = "Battleship";
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Clear();
-
-                Console.WriteLine("                                     |__");
-                Console.WriteLine(@"                                     |\/");
-                Console.WriteLine("                                     ---");
-                Console.WriteLine("                                     / | [");
-                Console.WriteLine("                              !      | |||");
-                Console.WriteLine("                            _/|     _/|-++'");
-                Console.WriteLine("                        +  +--|    |--|--|_ |-");
-                Console.WriteLine(@"                     { /|__|  |/\__|  |--- |||__/");
-                Console.WriteLine(@"                    +---------------___[}-_===_.'____                 /\");
-                Console.WriteLine(@"                ____`-' ||___-{]_| _[}-  |     |_[___\==--            \/   _");
-                Console.WriteLine(@" __..._____--==/___]_|__|_____________________________[___\==--____,------' .7");
-                Console.WriteLine(@"|                        Welcome to Battleship                         BB-61/");
-                Console.WriteLine(@" \_________________________________________________________________________|");
+                consoleRenderer.RenderLandingScreen();
                 Console.WriteLine();
 
                 InitializeGame();
@@ -60,69 +49,36 @@ namespace Battleship.Ascii
         private static void StartGame()
         {
             Console.Clear();
-            Console.WriteLine("                  __");
-            Console.WriteLine(@"                 /  \");
-            Console.WriteLine("           .-.  |    |");
-            Console.WriteLine(@"   *    _.-'  \  \__/");
-            Console.WriteLine(@"    \.-'       \");
-            Console.WriteLine("   /          _/");
-            Console.WriteLine(@"  |      _  /""");
-            Console.WriteLine(@"  |     /_\'");
-            Console.WriteLine(@"   \    \_/");
-            Console.WriteLine(@"    """"""""");
-
+            consoleRenderer.RenderCannon();
+            int round = 0;
             do
             {
-                Console.WriteLine();
-                Console.WriteLine("Player, it's your turn");
-                Console.WriteLine("Enter coordinates for your shot :");
-                var position = ParsePosition(Console.ReadLine());                
+                round++;
+                consoleRenderer.RenderStartRound(round);
+                var position = consoleRenderer.AskPlayerForPosition();        
                 var isHit = GameController.CheckIsHit(enemyFleet, position);
                 telemetryClient.TrackEvent("Player_ShootPosition", new Dictionary<string, string>() { { "Position", position.ToString() }, { "IsHit", isHit.ToString() } });
                 if (isHit)
                 {
-                    Console.Beep();
-
-                    Console.WriteLine(@"                \         .  ./");
-                    Console.WriteLine(@"              \      .:"";'.:..""   /");
-                    Console.WriteLine(@"                  (M^^.^~~:.'"").");
-                    Console.WriteLine(@"            -   (/  .    . . \ \)  -");
-                    Console.WriteLine(@"               ((| :. ~ ^  :. .|))");
-                    Console.WriteLine(@"            -   (\- |  \ /  |  /)  -");
-                    Console.WriteLine(@"                 -\  \     /  /-");
-                    Console.WriteLine(@"                   \  \   /  /");
+                    consoleRenderer.RenderExplosion("Yeah ! Nice hit !");
                 }
-
-                Console.WriteLine(isHit ? "Yeah ! Nice hit !" : "Miss");
-
+                else
+                {
+                    consoleRenderer.RenderMiss("Miss ! Water !");
+                }
                 position = GetRandomPosition();
                 isHit = GameController.CheckIsHit(myFleet, position);
                 telemetryClient.TrackEvent("Computer_ShootPosition", new Dictionary<string, string>() { { "Position", position.ToString() }, { "IsHit", isHit.ToString() } });
-                Console.WriteLine();
-                Console.WriteLine("Computer shot in {0}{1} and {2}", position.Column, position.Row, isHit ? "has hit your ship !" : "missed");
                 if (isHit)
                 {
-                    Console.Beep();
-
-                    Console.WriteLine(@"                \         .  ./");
-                    Console.WriteLine(@"              \      .:"";'.:..""   /");
-                    Console.WriteLine(@"                  (M^^.^~~:.'"").");
-                    Console.WriteLine(@"            -   (/  .    . . \ \)  -");
-                    Console.WriteLine(@"               ((| :. ~ ^  :. .|))");
-                    Console.WriteLine(@"            -   (\- |  \ /  |  /)  -");
-                    Console.WriteLine(@"                 -\  \     /  /-");
-                    Console.WriteLine(@"                   \  \   /  /");
-
+                    consoleRenderer.RenderExplosion($"Computer shot in {position.Column}{position.Row} and has hit your ship !");
+                }
+                else
+                {
+                    consoleRenderer.RenderMiss($"Computer shot in {position.Column}{position.Row} and missed!");
                 }
             }
             while (true);
-        }
-
-        public static Position ParsePosition(string input)
-        {
-            var letter = (Letters)Enum.Parse(typeof(Letters), input.ToUpper().Substring(0, 1));
-            var number = int.Parse(input.Substring(1, 1));
-            return new Position(letter, number);
         }
 
         private static Position GetRandomPosition()
@@ -147,15 +103,13 @@ namespace Battleship.Ascii
         {
             myFleet = GameController.InitializeShips().ToList();
 
-            Console.WriteLine("Please position your fleet (Game board size is from A to H and 1 to 8) :");
-
+            consoleRenderer.RenderLine(ConsoleColor.Magenta, "Please position your fleet (Game board size is from A to H and 1 to 8)");
             foreach (var ship in myFleet)
             {
-                Console.WriteLine();
-                Console.WriteLine("Please enter the positions for the {0} (size: {1})", ship.Name, ship.Size);
+                consoleRenderer.RenderLine(ConsoleColor.Magenta, $"Please enter the positions for the {ship.Name} (size: {ship.Size})");
                 for (var i = 1; i <= ship.Size; i++)
                 {
-                    Console.WriteLine("Enter position {0} of {1} (i.e A3):", i, ship.Size);
+                    consoleRenderer.Render(ConsoleColor.Yellow, $"Enter position {i} of {ship.Size} (i.e A3): ");
                     var position = Console.ReadLine();
                     ship.AddPosition(position);
                     telemetryClient.TrackEvent("Player_PlaceShipPosition", new Dictionary<string, string>() { { "Position", position }, { "Ship", ship.Name }, { "PositionInShip", i.ToString() } });
