@@ -71,4 +71,4 @@ If you want to run tests within VSCode, you can install the [.NET Core Test Expl
 This application is collecting telemetry data with Microsoft Application Insights.
 For more details see https://docs.microsoft.com/en-us/azure/azure-monitor/app/console.
 
-To send the telemetry data to a specific instance of Application Insights, the connection string has to be adjusted in ApplicationInsights.config.
+The telemetry data can be visualized at https://telemetrydashboard.azurewebsites.net/
