@@ -1,4 +1,4 @@
-[![Build status](https://dev.azure.com/APS-SD-Stewards/APS-SD/_apis/build/status/proscrumdev.battleship-dotnetcore-CI)](https://dev.azure.com/APS-SD-Stewards/APS-SD/_build/latest?definitionId=28)
+[![Build status](https://dev.azure.com/APS-SD-Stewards/APS-SD/_apis/build/status/proscrumdev.battleship-dotnet-CI)](https://dev.azure.com/APS-SD-Stewards/APS-SD/_build/latest?definitionId=14)
 
 [![build and test dotnet](https://github.com/proscrumdev/battleship-dotnet/actions/workflows/buildpipeline.yaml/badge.svg)](https://github.com/proscrumdev/battleship-dotnet/actions/workflows/buildpipeline.yaml)
 
