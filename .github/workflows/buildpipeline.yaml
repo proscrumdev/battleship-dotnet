@@ -8,6 +8,10 @@ on:
     - '**.cs'
     - '**.csproj'
 
+permissions:
+  contents: read
+  checks: write
+
 env:
   DOTNET_VERSION: '6.0' # The .NET SDK version to use
 
