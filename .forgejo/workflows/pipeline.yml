@@ -1,0 +1,15 @@
+on: [push]
+jobs:
+  ci:
+    runs-on: docker
+    container:
+      image: pgoetz/forgejo-runner-container:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          dotnet test
+          dotnet build --output ./build/ ./Battleship.Ascii/Battleship.Ascii.csproj
+      - uses: actions/upload-artifact@v3
+        with:
+          name: battleship
+          path: build

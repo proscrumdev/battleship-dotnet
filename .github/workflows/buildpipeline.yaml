@@ -13,7 +13,7 @@ permissions:
   checks: write
 
 env:
-  DOTNET_VERSION: '6.0' # The .NET SDK version to use
+  DOTNET_VERSION: '9.0' # The .NET SDK version to use
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET 6
+    - name: Setup .NET 9
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
