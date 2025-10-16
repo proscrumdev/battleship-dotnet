@@ -12,7 +12,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  dotNetVersion: '6.0.x'
+  dotNetVersion: '9.0.x'
 
 steps:
 
